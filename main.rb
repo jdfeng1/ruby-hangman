@@ -13,6 +13,8 @@ class Game
     start_game
   end
 
+  private
+
   def start_game
     @answer = select_word.split("")
     @progress = @answer.map {|x| "_"}
@@ -20,9 +22,8 @@ class Game
   end
 
   def game_loop
-    p @answer
     while true
-        puts "\r"
+      puts "\e[H\e[2J"
         display_progress(@progress)
         display_hangman(@incorrect)
         display_guessed(@prev_guesses)
@@ -44,7 +45,6 @@ class Game
             puts "Please pick a valid single letter"
           end
         end
-        puts guess
         if @answer.include? guess
           @answer.each_with_index do |letter, index|
             if letter == guess
@@ -53,13 +53,26 @@ class Game
           end
         else
           @prev_guesses.push(guess)
-          p @prev_guesses
           @incorrect += 1
         end
       end
     end
+    play_again?
   end
 
+  def play_again?
+    puts "Play again? [Y/N]"
+    choice = loop do
+      currentChoice = gets.chomp.upcase
+      break currentChoice if ["Y","N"].include? currentChoice 
+      puts "Please select [Y]es or [N]o"
+    end
+    if choice == "Y"
+      initialize
+    else
+      puts "\nGoodbye!\n"
+    end
+  end
 end
 
 
