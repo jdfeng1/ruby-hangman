@@ -84,4 +84,8 @@ module Hangman
      puts hangman[incorrect - 1]
   end
 
+  def display_progress(progress)
+    progress.each {|x| print x + " "}
+    puts "\n"
+  end
 end
