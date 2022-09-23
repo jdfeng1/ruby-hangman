@@ -83,4 +83,5 @@ module Hangman
 
      puts hangman[incorrect - 1]
   end
+
 end
