@@ -81,11 +81,17 @@ module Hangman
      |_____
      "]
 
-     puts hangman[incorrect - 1]
+     puts hangman[incorrect]
   end
 
   def display_progress(progress)
-    progress.each {|x| print x + " "}
+    progress.each {|x| print x.upcase + " "}
+    puts "\n"
+  end
+
+  def display_guessed(prev_guesses)
+    print "Already Guessed: "
+    prev_guesses.each {|x| print x.upcase + " "}
     puts "\n"
   end
 end
