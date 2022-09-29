@@ -1,19 +1,49 @@
 require_relative "lib/display.rb"
 require_relative "lib/dictionary.rb"
+require_relative "lib/saveload.rb"
 
 class Game
   include Hangman
   include Dictionary
+  include SaveLoad
 
   def initialize
+
+    Dir.mkdir('saves') unless Dir.exist?('saves')
+
     @answer = []
     @progress = []
     @incorrect = 0
     @prev_guesses = []
-    start_game
+    @saves = Dir.entries("saves").reject { |f| File.directory?(f) }
+
+    if @saves.empty?
+      start_game
+    else
+      puts "Would you like to load a save? [Y/N]"
+      choice = loop do
+        currentChoice = gets.chomp.upcase
+        break currentChoice if ["Y","N"].include? currentChoice 
+        puts "Please select [Y]es or [N]o"
+      end
+      if choice == "Y"
+        load_game
+      else
+        start_game
+      end
+    end
   end
 
   private
+
+  def load_game
+    init_load(@saves)
+    @answer = @saved_data[:answer]
+    @progress = @saved_data[:progress]
+    @incorrect = @saved_data[:incorrect]
+    @prev_guesses = @saved_data[:prev_guesses]
+    game_loop
+  end
 
   def start_game
     @answer = select_word.split("")
@@ -34,10 +64,12 @@ class Game
         puts "You guessed the word!"
         break
       else
-        puts "Guess a letter:"
+        puts "Guess a letter: \n(type \"save\" anytime to save your progress)"
         guess = loop do
           currentChoice = gets.chomp
-          if @prev_guesses.include?(currentChoice) || @progress.include?(currentChoice)
+          if currentChoice == "save"
+            init_save(@answer, @progress, @incorrect, @prev_guesses)
+          elsif @prev_guesses.include?(currentChoice) || @progress.include?(currentChoice)
             puts "You already guessed that letter--pick another!"
           elsif currentChoice.match? /^[a-zA-Z]$/
             break currentChoice
@@ -73,6 +105,8 @@ class Game
       puts "\nGoodbye!\n"
     end
   end
+
+  
 end
 
 
